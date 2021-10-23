@@ -24,7 +24,8 @@ print("-------------------------" + "\n" + "-------------------------")
 
 # Info checking phase
 
-print(InfoManager.create("Input torch: ", white, black))
+InfoManager.create(white, black)
+print(InfoManager.get_torch())
 
 # Action phase
 while flag1 and flag2:

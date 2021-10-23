@@ -5,8 +5,7 @@ class InfoManager(object):
     white = []
     black = []
     team_list = []
-    white_info = []
-    black_info = []
+    teams_info = []
     cur_unit = []
 
     @staticmethod
@@ -24,35 +23,54 @@ class InfoManager(object):
 
     @staticmethod
     def info_update():
-        InfoManager.white_info.clear()
-        InfoManager.black_info.clear()
+        InfoManager.teams_info.clear()
         InfoManager.cur_unit.clear()
 
+        counter = 0
+
         for i in InfoManager.white:
+            counter += 1
+            InfoManager.cur_unit = []
+            print("unit ", counter, " initialisation")
+            print("unit team - white")
+            InfoManager.cur_unit.append(1)
             if i.skin == "a":
                 InfoManager.cur_unit.append(1)
             elif i.skin == "d":
                 InfoManager.cur_unit.append(2)
             elif i.skin == "g":
                 InfoManager.cur_unit.append(3)
+            print("type of unit - ", InfoManager.cur_unit[0])
             InfoManager.cur_unit.append(i.posX)
+            print("x of unit - ", InfoManager.cur_unit[1])
             InfoManager.cur_unit.append(i.posY)
-            InfoManager.white_info.append(InfoManager.cur_unit)
+            print("y of unit - ", InfoManager.cur_unit[2])
+            print(InfoManager.cur_unit)
+            InfoManager.teams_info.append(InfoManager.cur_unit)
 
         for i in InfoManager.black:
+            counter += 1
+            InfoManager.cur_unit = []
+            print("unit ", counter, " initialisation")
+            print("unit team - black")
+            InfoManager.cur_unit.append(2)
             if i.skin == "a":
                 InfoManager.cur_unit.append(1)
             elif i.skin == "d":
                 InfoManager.cur_unit.append(2)
             elif i.skin == "g":
                 InfoManager.cur_unit.append(3)
+            print("type of unit - ", InfoManager.cur_unit[0])
             InfoManager.cur_unit.append(i.posX)
+            print("x of unit - ", InfoManager.cur_unit[1])
             InfoManager.cur_unit.append(i.posY)
-            InfoManager.black_info.append(InfoManager.cur_unit)
+            print("y of unit - ", InfoManager.cur_unit[2])
+            print(InfoManager.cur_unit)
+            InfoManager.teams_info.append(InfoManager.cur_unit)
 
     @staticmethod
     def get_torch():
-        return torch.IntTensor(InfoManager.white_info, InfoManager.black_info)
+        return torch.IntTensor(InfoManager.teams_info)
 
     @staticmethod
     def create(white, black):

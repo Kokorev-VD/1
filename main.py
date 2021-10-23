@@ -1,6 +1,7 @@
 from attacker import Attacker
 from defender import Defender
 from gunner import Gunner
+from infoManager import InfoManager
 
 # Creation phase
 pole = [[-1, -1, -1, -1, -1, -1, -1],
@@ -20,6 +21,10 @@ flag1 = True
 flag2 = True
 counter = 0
 print("-------------------------" + "\n" + "-------------------------")
+
+# Info checking phase
+print(InfoManager.create(white, black))
+
 # Action phase
 while flag1 and flag2:
     counter = 0

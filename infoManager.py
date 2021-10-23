@@ -61,3 +61,4 @@ class InfoManager(object):
         InfoManager.update_team_list()
         InfoManager.info_update()
         return InfoManager.get_torch()
+

@@ -23,6 +23,7 @@ counter = 0
 print("-------------------------" + "\n" + "-------------------------")
 
 # Info checking phase
+
 print(InfoManager.create(white, black))
 
 # Action phase

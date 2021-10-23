@@ -11,6 +11,7 @@ pole = [[-1, -1, -1, -1, -1, -1, -1],
         [-1, -1, -1, -1, -1, -1, -1]]
 white = []
 black = []
+
 white.append(Attacker(1, 2, pole, "White"))
 white.append(Defender(3, 2, pole, "White"))
 black.append(Attacker(1, 5, pole, "Black"))

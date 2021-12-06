@@ -2,20 +2,33 @@ from attacker import Attacker
 from defender import Defender
 from gunner import Gunner
 from infoManager import InfoManager
+from fieldManager import FieldManager
+from net import Net
 
 # Creation phase
-pole = [[-1, -1, -1, -1, -1, -1, -1],
+"""pole = [[-1, -1, -1, -1, -1, -1, -1],
         [-1, 0, 0, 0, 0, 0, -1],
         [-1, 0, 0, 0, 0, 0, -1],
         [-1, 0, 0, 0, 0, 0, -1],
-        [-1, -1, -1, -1, -1, -1, -1]]
+        [-1, -1, -1, -1, -1, -1, -1]]"""
+
+pole = [[-1, -1, -1, -1],
+        [-1,  0,  0, -1],
+        [-1,  0,  0, -1],
+        [-1, -1, -1, -1]]
+
 white = []
 black = []
-white.append(Attacker(1, 2, pole, "White"))
+
+white.append(Attacker(1, 1, pole, "White"))
+black.append(Gunner(1, 2, pole, "Black"))
+black.append(Defender(2, 2, pole, "Black"))
+
+"""white.append(Attacker(1, 2, pole, "White"))
 white.append(Defender(3, 2, pole, "White"))
 black.append(Attacker(1, 5, pole, "Black"))
 black.append(Attacker(2, 4, pole, "Black"))
-black.append(Gunner(2, 5, pole, "Black"))
+black.append(Gunner(2, 5, pole, "Black"))"""
 
 flag1 = True
 flag2 = True
@@ -24,14 +37,20 @@ print("-------------------------" + "\n" + "-------------------------")
 
 # Info checking phase
 
-InfoManager.create(white, black)
-print(InfoManager.get_torch())
+"""InfoManager.create(white, black)
+print(InfoManager.get_torch())"""
+
+FieldManager.init_field(white, black, pole)
+FieldManager.print_field()
+
+net = Net()
+print(net)
 
 # Action phase
 while flag1 and flag2:
     counter = 0
     # Our pole
-    for x in range(5):
+    for x in range(len(pole)):
         print(pole[x])
     print("-------------------------" + "\n" + "-------------------------")
     # Attack phase
@@ -82,15 +101,15 @@ while flag1 and flag2:
     print("WHITE TEAM HEALTH")
     for x in white:
         print("Health " + x.side + " " + x.name() + " at position: " +
-                      str(x.posX) + " " + str(x.posY) + " equals: " + str(x.health))
+              str(x.x_position) + " " + str(x.y_position) + " equals: " + str(x.health))
     print("-------------------------" + "\n" + "-------------------------")
     print("BLACK TEAM HEALTH")
     for x in black:
         print("Health " + x.side + " " + x.name() + " at position: " +
-              str(x.posX) + " " + str(x.posY) + " equals: " + str(x.health))
+              str(x.x_position) + " " + str(x.y_position) + " equals: " + str(x.health))
     print("-------------------------" + "\n" + "-------------------------")
 
-for x in range(5):
+for x in range(len(pole)):
     print(pole[x])
 print("-------------------------" + "\n" + "-------------------------")
 # Final phase

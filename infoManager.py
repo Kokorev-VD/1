@@ -41,9 +41,9 @@ class InfoManager(object):
             elif i.skin == "g":
                 InfoManager.cur_unit.append(3)
             print("type of unit - ", InfoManager.cur_unit[0])
-            InfoManager.cur_unit.append(i.posX)
+            InfoManager.cur_unit.append(i.x_position)
             print("x of unit - ", InfoManager.cur_unit[1])
-            InfoManager.cur_unit.append(i.posY)
+            InfoManager.cur_unit.append(i.y_position)
             print("y of unit - ", InfoManager.cur_unit[2])
             print(InfoManager.cur_unit)
             InfoManager.teams_info.append(InfoManager.cur_unit)
@@ -61,9 +61,9 @@ class InfoManager(object):
             elif i.skin == "g":
                 InfoManager.cur_unit.append(3)
             print("type of unit - ", InfoManager.cur_unit[0])
-            InfoManager.cur_unit.append(i.posX)
+            InfoManager.cur_unit.append(i.x_position)
             print("x of unit - ", InfoManager.cur_unit[1])
-            InfoManager.cur_unit.append(i.posY)
+            InfoManager.cur_unit.append(i.y_position)
             print("y of unit - ", InfoManager.cur_unit[2])
             print(InfoManager.cur_unit)
             InfoManager.teams_info.append(InfoManager.cur_unit)

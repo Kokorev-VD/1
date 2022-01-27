@@ -8,12 +8,14 @@ class Unit(object):
     side = ""
     moved = True
     attacked = False
+    print_attack = False
 
-    def __init__(self, posX, posY, pole, side):
+    def __init__(self, posX, posY, pole, side, print_attack):
         self.x_position = posX
         self.y_position = posY
         pole[self.x_position][self.y_position] = self.skin
         self.side = side
+        self.print_attack = print_attack
 
     def get_x(self):
         return self.x_position
@@ -30,10 +32,11 @@ class Unit(object):
                                                      self.y_position - 1 == cls.y_position and self.x_position == cls.x_position)) and self.side != cls.side:
                 self.health -= cls.damage
                 cls.attacked = True
-                print(cls.side + " " + cls.name() + " at position: " + str(
+                if self.print_attack:
+                    print(cls.side + " " + cls.name() + " at position: " + str(
                     cls.x_position) + " " + str(cls.y_position) + " attacked " + self.side + " " + self.name() + " at position: " +
                       str(self.x_position) + " " + str(self.y_position))
-                print("-------------------------" + "\n" + "-------------------------")
+                    print("-------------------------" + "\n" + "-------------------------")
         if cls.name() == "Defender":
             if self.alive and cls.alive and ((self.x_position + 1 == cls.x_position and self.y_position + 1 == cls.y_position) or (
                     self.x_position - 1 == cls.x_position and self.y_position + 1 == cls.y_position) or (
@@ -41,19 +44,21 @@ class Unit(object):
                                                      self.x_position - 1 == cls.x_position and self.y_position - 1 == cls.y_position)) and self.side != cls.side:
                 self.health -= cls.damage
                 cls.attacked = True
-                print(cls.side + " " + cls.name() + " at position: " + str(cls.x_position) + " " + str(
+                if self.print_attack:
+                    print(cls.side + " " + cls.name() + " at position: " + str(cls.x_position) + " " + str(
                     cls.y_position) + " attacked " + self.side + " " + self.name() + " at position: " +
                       str(self.x_position) + " " + str(self.y_position))
-                print("-------------------------" + "\n" + "-------------------------")
+                    print("-------------------------" + "\n" + "-------------------------")
         if cls.name() == "Gunner":
             if self.alive and cls.alive and (
                     self.x_position == cls.x_position and (self.y_position < cls.y_position + 3 or self.y_position > cls.y_position - 3)):
                 self.health -= cls.damage
                 cls.attacked = True
-                print(cls.side + " " + cls.name() + " at position: " + str(cls.x_position) + " " + str(
+                if self.print_attack:
+                    print(cls.side + " " + cls.name() + " at position: " + str(cls.x_position) + " " + str(
                     cls.y_position) + " attacked " + self.side + " " + self.name() + " at position: " +
                       str(self.x_position) + " " + str(self.y_position))
-                print("-------------------------" + "\n" + "-------------------------")
+                    print("-------------------------" + "\n" + "-------------------------")
 
     def death(self, pole):
         self.damage = 0

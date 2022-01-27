@@ -7,6 +7,10 @@ class FieldManager(object):
     black = []
 
     @staticmethod
+    def get_field(field):
+        return field
+
+    @staticmethod
     def create_field():
         FieldManager.field = []
         quantity = FieldManager.field_width * FieldManager.field_height

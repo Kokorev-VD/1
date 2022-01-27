@@ -4,6 +4,8 @@ from gunner import Gunner
 from infoManager import InfoManager
 from fieldManager import FieldManager
 from net import Net
+from fighter import Fighter
+from neural import Neural
 
 # Creation phase
 """pole = [[-1, -1, -1, -1, -1, -1, -1],
@@ -20,9 +22,9 @@ pole = [[-1, -1, -1, -1],
 white = []
 black = []
 
-white.append(Attacker(1, 1, pole, "White"))
-black.append(Gunner(1, 2, pole, "Black"))
-black.append(Defender(2, 2, pole, "Black"))
+white.append(Attacker(1, 1, pole, "White", True))
+black.append(Gunner(1, 2, pole, "Black", True))
+black.append(Defender(2, 2, pole, "Black", True))
 
 """white.append(Attacker(1, 2, pole, "White"))
 white.append(Defender(3, 2, pole, "White"))
@@ -43,7 +45,7 @@ print(InfoManager.get_torch())"""
 FieldManager.init_field(white, black, pole)
 FieldManager.print_field()
 
-net = Net()
+net = Net(4)
 print(net)
 
 # Action phase
@@ -119,3 +121,7 @@ elif flag2:
     print("Black wins")
 else:
     print("Draw")
+
+test = [[1, -3], [0, -2]]
+fighter = Fighter()
+print(fighter.get_data(test))

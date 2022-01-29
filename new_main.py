@@ -9,10 +9,10 @@ print("test", fighter.get_data(test))'''
 
 accuracies = []
 
-neo = Neural(3, 5, "Fernando", 2, 1)
-neo.change_super_parameters(1e-4, 50, 0.5, 120)
-neo.init_net()
-accuracies.append(neo.train())
+neo1 = Neural(3, 5, "Daniel", 2, 1)
+neo1.change_super_parameters(1e-5, 150, 0.5, 200)
+neo1.init_net()
+accuracies.append(neo1.train())
 
 print(accuracies)
 

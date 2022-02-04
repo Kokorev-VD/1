@@ -23,11 +23,16 @@ class Neural:
     learn_size = 0.8
     layer_size = 20
     rater = SituationRater()
+    accuracies = []
+    acc_diff = []
     timer = 0
     start = 0
     name = ""
     load_mode = 0
     train_mode = 0
+    auto_stop = False
+    auto_break = 0
+    auto_flag = False
 
     def change_super_parameters(self, lr, n_epochs, learn_size, layer_size):
         self.lr = lr
@@ -35,7 +40,7 @@ class Neural:
         self.learn_size = learn_size
         self.layer_size = layer_size
 
-    def __init__(self, height, length, name, load_mode, train_mode):
+    def __init__(self, height, length, name, load_mode, train_mode, auto_stop):
         # resetting
         self.train_mode = train_mode
         self.name = name
@@ -52,6 +57,12 @@ class Neural:
         self.rater = SituationRater()
         self.timer = 0
         self.start = 0
+
+        if auto_stop != 0:
+            self.auto_stop = True
+            self.auto_break = auto_stop
+        else:
+            self.auto_stop = False
 
         if len(self.name) != 0:
             print("The name of this net is ", self.name, ". It starts initialisation. ", time.asctime(), sep="")
@@ -161,6 +172,9 @@ class Neural:
         return train_step
 
     def train(self):
+        self.auto_flag = False
+        self.accuracies = []
+        self.acc_diff = []
         # trainer = Trainer()
         # trainer.fit(self.model, self.train_loader, self.val_loader)
         # Training loop
@@ -207,7 +221,22 @@ class Neural:
                     s = 0
                     for i in range(len(accuracy)):
                         s += accuracy[i]
+                    self.accuracies.append(s / len(accuracy) * 100)
                     print("accuracy is ", s / len(accuracy) * 100, "%", sep="")
+                    if self.auto_stop:
+                        if len(self.accuracies) > 1:
+                            self.acc_diff.append(self.accuracies[len(self.accuracies) - 1] -
+                                                 self.accuracies[len(self.accuracies) - 2])
+                            if self.accuracies[len(self.accuracies) - 1] - self.accuracies[len(self.accuracies) - 2] <\
+                                    self.auto_break:
+                                if self.auto_flag:
+                                    print(time.asctime(), "Training stopped automatically")
+                                    break
+                                else:
+                                    print("Accuracy alert!")
+                                    self.auto_flag = True
+                            else:
+                                self.auto_flag = False
 
             # print(model.state_dict())
             print(np.mean(self.losses))
@@ -374,3 +403,11 @@ class Neural:
             array = arr.copy()
             array.append(self.wordlist[3])
             self.create_data_small(array)
+
+    def add_stat(self, array):
+        if len(self.accuracies) != 0:
+            if len(self.name) == 0:
+                array.append(["Unnamed", self.accuracies])
+            else:
+                array.append([self.name, self.accuracies])
+        return array

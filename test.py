@@ -1,16 +1,21 @@
 import pygame
 
 pygame.init()
-screen = pygame.display.set_mode((1000, 1000))
+screen = pygame.display.set_mode((1900, 1000))
 
 pygame.display.flip()
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 20)
 
+pole = [["O", "O", "O"], ["O", "O", "O"], ['a', "O", 'c'], ["O", "O", "O"], ["O", 'd', "O"]]
+
+def set_pole(pol):
+    pole = pol
 nmbrs = "0123456789"
 
 class Button:
     def __init__(self, text, pos, font, number, bg="black", feedback=""):
+        self.bg = bg
         self.x, self.y = pos
         self.number = number
         self.t = text
@@ -27,6 +32,8 @@ class Button:
 
     def change_text(self, text, bg="black"):
         self.text = self.font.render(text, 1, pygame.Color("White"))
+        if self.feedback == "text":
+            self.text = self.font.render(str(pole[int(self.number/3)][self.number%3]), 1, pygame.Color("White"))
         self.size = self.text.get_size()
         self.surface = pygame.Surface(self.size)
         self.surface.fill(bg)
@@ -43,11 +50,15 @@ class Button:
             if pygame.mouse.get_pressed()[0]:
                 if self.rect.collidepoint(x, y) and self.feedback == "Creation btn":
                     for btn in btns:
+                        if btn.bg == "red":
+                            btn.visible = False
                         if btn.feedback[len(btn.feedback) - 1] in nmbrs:
                             if self.number == int(btn.feedback[len(btn.feedback) - 1]):
                                 btn.visible = True
                 if self.rect.collidepoint(x, y) and self.feedback[:len(self.feedback)-1] == "Making btn":
                     for btn in btns:
+                        if btn.bg == "red":
+                            btn.visible = True
                         if btn.number == int(self.feedback[len(self.feedback)-1]):
                             btn.change_text(self.t, "navy")
                             btn.t = self.t
@@ -63,9 +74,12 @@ class Button:
                     print(res)
 
 def mainloop():
-
+    back_s = pygame.image.load('bcg.png')
+    back_s = pygame.transform.scale(back_s, (1900, 1000))
+    back = back_s.get_rect(bottomright = (1900, 1000))
     while True:
         screen.fill((215, 225, 250))
+        screen.blit(back_s, back)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -78,21 +92,21 @@ def mainloop():
         pygame.display.update()
 
 
-ix = 100
-iy = 100
+ix = 360
+iy = 155
 btns = []
 for i in range(2):
     for j in range(3):
         button1 = Button(
             " O ",
-            (ix+i*120, iy+j*120),
+            (ix+i*290, iy+j*264),
             font=30,
             number=j+3*i,
             bg="navy",
             feedback="Creation btn")
         btn1 = Button(
             " a ",
-            (ix+i*120+30, iy+j*120),
+            (ix+i*290+30, iy+j*264),
             font=30,
             number=-1,
             bg="green",
@@ -100,7 +114,7 @@ for i in range(2):
 
         btn2 = Button(
             " d ",
-            (ix+i*120+30, iy+j*120+30),
+            (ix+i*290+30, iy+j*264+30),
             font=30,
             number=-1,
             bg="green",
@@ -108,7 +122,7 @@ for i in range(2):
 
         btn3 = Button(
             " g ",
-            (ix+i*120+30, iy+j*120+60),
+            (ix+i*290+30, iy+j*264+60),
             font=30,
             number = -1,
             bg="green",
@@ -117,24 +131,23 @@ for i in range(2):
         btns.append(btn1)
         btns.append(btn2)
         btns.append(btn3)
-ix += 120*2
+ix += 290*2
 for i in range(3):
     for j in range(3):
         b1 = Button(
             " O ",
-            (ix + i * 120, iy + j * 120),
+            (ix + i * 290, iy + j * 264),
             font=30,
             number=j + 3 * i+6,
             bg="red",
             feedback="")
         btns.append(b1)
-
 endbut = Button(
             " Нажмите, чтобы отправить данные нейросети ",
-            (400, 900),
+            (670, 900),
             font=30,
             number=-2,
-            bg="cyan",
+            bg="black",
             feedback="End btn")
 btns.append(endbut)
 mainloop()

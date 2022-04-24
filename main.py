@@ -6,13 +6,19 @@ from fieldManager import FieldManager
 from net import Net
 from fighter import Fighter
 from neural import Neural
-
+from Button import Button
+import pygame
 # Creation phase
 """pole = [[-1, -1, -1, -1, -1, -1, -1],
         [-1, 0, 0, 0, 0, 0, -1],
         [-1, 0, 0, 0, 0, 0, -1],
         [-1, 0, 0, 0, 0, 0, -1],
         [-1, -1, -1, -1, -1, -1, -1]]"""
+
+pygame.init()
+screen = pygame.display.set_mode((500, 600))
+clock = pygame.time.Clock()
+font = pygame.font.SysFont("Arial", 20)
 
 pole = [[-1, -1, -1, -1],
         [-1,  0,  0, -1],
@@ -47,6 +53,22 @@ FieldManager.print_field()
 
 net = Net(4)
 print(net)
+button1 = Button(
+    "Click here",
+    (100, 100),
+    font=30,
+    bg="navy",
+    feedback="You clicked me")
+button1.set_screen(screen)
+def mainloop():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            button1.click(event)
+        button1.show()
+        clock.tick(30)
+        pygame.display.update()
 
 # Action phase
 while flag1 and flag2:
@@ -121,6 +143,7 @@ elif flag2:
     print("Black wins")
 else:
     print("Draw")
+mainloop()
 
 test = [[1, -3], [0, -2]]
 fighter = Fighter()

@@ -33,6 +33,9 @@ class Neural:
     auto_stop = False
     auto_break = 0
     auto_flag = False
+    in_special = []
+    rate_special = []
+    out_special = []
 
     def change_super_parameters(self, lr, n_epochs, learn_size, layer_size):
         self.lr = lr
@@ -47,6 +50,9 @@ class Neural:
         self.load_mode = load_mode
         self.size = 0
         self.in_data = []
+        self.in_special = []
+        self.rate_special = []
+        self.out_special = []
         self.out_data = []
         self.in_rate = []
         self.length = 0
@@ -321,6 +327,44 @@ class Neural:
 
         return s / len(accuracy) * 100
 
+    def get_best(self, arr_input):
+        fighter = Fighter()
+        # print("answers creating")
+        for i in range(len(self.in_special)):
+            pole = self.convert_field(self.in_special[i])
+            # print(self.in_data[i], " > ", pole)
+            self.out_special.append(fighter.get_data(pole))
+            if i % 50000 == 0:
+                print(i, self.out_data[len(self.out_special) - 1])
+        # print("answers created")
+
+        self.in_special_np = np.array(self.rate_special)
+        self.out_special_np = np.array(self.out_data)
+
+        self.special_x_tensor = torch.from_numpy(self.in_special_np).float()
+        self.special_y_tensor = torch.from_numpy(self.out_special_np).long()
+
+        self.special_dataset = TensorDataset(self.special_x_tensor, self.special_y_tensor)
+        self.special_loader = DataLoader(dataset=self.special_dataset, batch_size=7)
+
+        max_pred = 0
+        max_batch = []
+        i_max = 0
+
+        with torch.no_grad():
+            t = 0
+            for x_sp, y_sp in self.special_dataset:
+                batch = torch.exp(self.model(x_sp)).tolist()
+                for i in range(len(batch)):
+                    t += 1
+                    if batch[i][0] > max_pred:
+                        max_pred = batch[i][0]
+                        max_batch = batch[i]
+                        i_max = t
+
+        answer = [max_pred, max_batch, self.in_special[i_max], i_max]
+        return answer
+
     def get_acc(self, flag):
         accuracy = []
         # print("getting accuracy")
@@ -380,6 +424,19 @@ class Neural:
 
     wordlist = [-3, -2, -1, 0, 1, 2, 3]
 
+    def create_special_answers(self):
+        fighter = Fighter()
+        # print("answers creating")
+        for i in range(len(self.in_data)):
+            pole = self.convert_field(self.in_data[i])
+            # print(self.in_data[i], " > ", pole)
+            self.out_data.append(fighter.get_data(pole))
+            if i % 50000 == 0:
+                print(i, self.out_data[len(self.out_data) - 1])
+        # print("answers created")
+
+    wordlist = [-3, -2, -1, 0, 1, 2, 3]
+
     def create_data_small(self, arr):
         if len(arr) == self.size:
             self.in_data.append(arr)
@@ -390,12 +447,12 @@ class Neural:
         y = len(arr) // self.length
         x = len(arr) - y * self.length
         if x <= max(0, int(self.length / 2 - 1)):
-            for i in range(4, 7):
+            for i in range(3, 7):
                 array = arr.copy()
                 array.append(self.wordlist[i])
                 self.create_data_small(array)
         elif x >= min(self.length - 1, int((self.length + 1) / 2)):
-            for i in range(3):
+            for i in range(4):
                 array = arr.copy()
                 array.append(self.wordlist[i])
                 self.create_data_small(array)
@@ -403,6 +460,32 @@ class Neural:
             array = arr.copy()
             array.append(self.wordlist[3])
             self.create_data_small(array)
+
+    def get_special_data(self, arr, arr_input):
+        if len(arr) == self.size:
+            self.in_special.append(arr)
+            self.rate_special.append(self.rater.get_rating(self.convert_field(arr)))
+            if len(self.in_special) % 50000 == 0:
+                print(len(self.in_data), self.in_data[len(self.in_special) - 1], self.rate_special[len(self.in_rate) - 1])
+            return
+        if len(arr) < len(arr_input):
+            arr = arr_input.copy()
+        y = len(arr) // self.length
+        x = len(arr) - y * self.length
+        if x <= max(0, int(self.length / 2 - 1)):
+            for i in range(3, 7):
+                array = arr.copy()
+                array.append(self.wordlist[i])
+                self.get_special_data(array, arr_input)
+        elif x >= min(self.length - 1, int((self.length + 1) / 2)):
+            for i in range(4):
+                array = arr.copy()
+                array.append(self.wordlist[i])
+                self.get_special_data(array, arr_input)
+        else:
+            array = arr.copy()
+            array.append(self.wordlist[3])
+            self.get_special_data(array, arr_input)
 
     def add_stat(self, array):
         if len(self.accuracies) != 0:

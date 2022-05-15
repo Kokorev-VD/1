@@ -1,4 +1,13 @@
 import pygame
+from fighter import Fighter
+from fieldManager import FieldManager
+
+import torch
+from heatmaper import Heatmaper
+from neural import Neural
+from statManager import StatManager
+from situationRater import SituationRater
+from net import Net
 
 pygame.init()
 screen = pygame.display.set_mode((1900, 1000))
@@ -7,11 +16,13 @@ pygame.display.flip()
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 20)
 
-pole = [["O", "O", "O"], ["O", "O", "O"], ['a', "O", 'c'], ["O", "O", "O"], ["O", 'd', "O"]]
+pole = [["O", "O", "O"], ["O", "O", "O"], ["", "", ""], ["O", "O", "O"], ["O", 'O', "O"]]
+nmbrs = "0123456789"
+
 
 def set_pole(pol):
     pole = pol
-nmbrs = "0123456789"
+
 
 class Button:
     def __init__(self, text, pos, font, number, bg="black", feedback=""):
@@ -70,9 +81,58 @@ class Button:
                 if self.rect.collidepoint(x, y) and self.feedback == "End btn":
                     res = [[0, 0], [0, 0], [0, 0]]
                     for btn in btns:
-                        if btn.number<6 and btn.number>-1:
-                            res[btn.number%3][int(btn.number/3)] = btn.t
-                    print(res)
+                        if btn.number < 6 and btn.number > -1:
+                            res[btn.number % 3][int(btn.number / 3)] = btn.t
+                    print(res)  # <------
+                    true_res = []
+                    ava = 0
+                    for st in res:
+                        for un in st:
+                            if un == ' a ':
+                                true_res.append(1)
+                                ava += 1
+                            elif un == ' d ':
+                                true_res.append(2)
+                                ava += 1
+                            elif un == ' g ':
+                                true_res.append(3)
+                                ava += 1
+                            else:
+                                true_res.append(0)
+                    print(true_res, ava)
+
+                    # acs = []
+                    # stat = []
+
+                    neo1 = Neural(3, 5, "", 2, 2, 0.005, 1)
+                    neo1.change_super_parameters(1e-5, 300, 0.005, 200)
+                    neo1.init_net()
+                    # neo1.stop_calculating_acc()
+                    # acs.append(neo1.train())
+                    # stat = neo1.add_stat(stat)
+                    #
+                    # print(acs)
+                    neo1.train()  # НЕ СТЕРАТЬ, даже если кажется, что не нужно
+
+                    # StatManager.create_stat(stat)
+                    # StatManager.show_all()
+
+                    neo1.get_special_data([], true_res, ava)
+                    print(neo1.get_best())
+                    print(FieldManager.get_best())
+
+                    # Пример вывода после нажатия на кнопку:
+                    #
+                    # [[' O ', ' O '], [' a ', ' O '], [' O ', ' O ']] - входные данные
+                    # [0, 0, 1, 0, 0, 0] 1 - обработанные данные
+                    # Net init starts. Mon May 16 00:46:45 2022 - информация о ИИ (бесполезная информация)
+                    # net inited in  0.0 minutes - скорость ее инициализации (бесполезная информация)
+                    # [0.7367120981216431, [0.012937579303979874, 0.25035035610198975, 0.7367120981216431], [0, 0, 0, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0], 7] - полезный вывод
+                    # [0, 0, 0, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0] - расстановка на поле (построчно: первая строка, затем средняя и потом нижняя)
+                    #
+                    # последнюю подобранную расстановку можно посмотреть тут - FieldManager.get_best()
+
+
 
 def mainloop():
     back_s = pygame.image.load('bcg.png')

@@ -364,18 +364,22 @@ class Neural:
         max_pred = 0
         max_batch = []
         i_max = 0
+        t = 0
 
         with torch.no_grad():
-            t = 0
             for x_sp, y_sp in self.special_dataset:
                 batch = torch.exp(self.model(x_sp)).tolist()
-                # print(batch)
-                if batch[0] > max_pred:
-                    max_pred = batch[0]
+                # print(batch, end='')
+                if (batch[2] > max_pred and t < len(self.in_special) - 1) or t == 0:
+                    max_pred = batch[2]
                     max_batch = batch
                     i_max = t
+                    # print(" <-", end='')
+                # print("")
+                t += 1
 
         answer = [max_pred, max_batch, self.in_special[i_max], i_max]
+        FieldManager.set_best(answer[2])
         return answer
 
     def get_acc(self, flag):

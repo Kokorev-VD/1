@@ -5,10 +5,19 @@ class FieldManager(object):
     quantity = -1
     white = []
     black = []
+    last_best = []
 
     @staticmethod
     def get_field(field):
         return field
+
+    @staticmethod
+    def set_best(new_best):
+        FieldManager.last_best = new_best
+
+    @staticmethod
+    def get_best():
+        return FieldManager.last_best
 
     @staticmethod
     def create_field():

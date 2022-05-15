@@ -33,7 +33,7 @@ class Button:
     def change_text(self, text, bg="black"):
         self.text = self.font.render(text, 1, pygame.Color("White"))
         if self.feedback == "text":
-            self.text = self.font.render(str(pole[int(self.number/3)][self.number%3]), 1, pygame.Color("White"))
+            self.text = self.font.render(str(pole[int(self.number / 3)][self.number % 3]), 1, pygame.Color("White"))
         self.size = self.text.get_size()
         self.surface = pygame.Surface(self.size)
         self.surface.fill(bg)
@@ -55,16 +55,17 @@ class Button:
                         if btn.feedback[len(btn.feedback) - 1] in nmbrs:
                             if self.number == int(btn.feedback[len(btn.feedback) - 1]):
                                 btn.visible = True
-                if self.rect.collidepoint(x, y) and self.feedback[:len(self.feedback)-1] == "Making btn":
+                if self.rect.collidepoint(x, y) and self.feedback[:len(self.feedback) - 1] == "Making btn":
                     for btn in btns:
                         if btn.bg == "red":
                             btn.visible = True
-                        if btn.number == int(self.feedback[len(self.feedback)-1]):
+                        if btn.number == int(self.feedback[len(self.feedback) - 1]):
                             btn.change_text(self.t, "navy")
                             btn.t = self.t
                             for btn1 in btns:
                                 if btn1.feedback[len(btn1.feedback) - 1] in nmbrs:
-                                    if int(self.feedback[len(self.feedback) - 1]) == int(btn1.feedback[len(btn1.feedback) - 1]):
+                                    if int(self.feedback[len(self.feedback) - 1]) == int(
+                                            btn1.feedback[len(btn1.feedback) - 1]):
                                         btn1.visible = False
                 if self.rect.collidepoint(x, y) and self.feedback == "End btn":
                     res = [[0, 0], [0, 0], [0, 0]]
@@ -76,7 +77,7 @@ class Button:
 def mainloop():
     back_s = pygame.image.load('bcg.png')
     back_s = pygame.transform.scale(back_s, (1900, 1000))
-    back = back_s.get_rect(bottomright = (1900, 1000))
+    back = back_s.get_rect(bottomright=(1900, 1000))
     while True:
         screen.fill((215, 225, 250))
         screen.blit(back_s, back)
@@ -99,55 +100,55 @@ for i in range(2):
     for j in range(3):
         button1 = Button(
             " O ",
-            (ix+i*290, iy+j*264),
+            (ix + i * 290, iy + j * 264),
             font=30,
-            number=j+3*i,
+            number=j + 3 * i,
             bg="navy",
             feedback="Creation btn")
         btn1 = Button(
             " a ",
-            (ix+i*290+30, iy+j*264),
+            (ix + i * 290 + 30, iy + j * 264),
             font=30,
             number=-1,
             bg="green",
-            feedback="Making btn" + str(j+3*i))
+            feedback="Making btn" + str(j + 3 * i))
 
         btn2 = Button(
             " d ",
-            (ix+i*290+30, iy+j*264+30),
+            (ix + i * 290 + 30, iy + j * 264 + 30),
             font=30,
             number=-1,
             bg="green",
-            feedback="Making btn" + str(j+3*i))
+            feedback="Making btn" + str(j + 3 * i))
 
         btn3 = Button(
             " g ",
-            (ix+i*290+30, iy+j*264+60),
+            (ix + i * 290 + 30, iy + j * 264 + 60),
             font=30,
-            number = -1,
+            number=-1,
             bg="green",
-            feedback="Making btn" + str(j+3*i))
+            feedback="Making btn" + str(j + 3 * i))
         btns.append(button1)
         btns.append(btn1)
         btns.append(btn2)
         btns.append(btn3)
-ix += 290*2
+ix += 290 * 2
 for i in range(3):
     for j in range(3):
         b1 = Button(
             " O ",
             (ix + i * 290, iy + j * 264),
             font=30,
-            number=j + 3 * i+6,
+            number=j + 3 * i + 6,
             bg="red",
             feedback="")
         btns.append(b1)
 endbut = Button(
-            " Нажмите, чтобы отправить данные нейросети ",
-            (670, 900),
-            font=30,
-            number=-2,
-            bg="black",
-            feedback="End btn")
+    " Нажмите, чтобы отправить данные нейросети ",
+    (670, 900),
+    font=30,
+    number=-2,
+    bg="black",
+    feedback="End btn")
 btns.append(endbut)
 mainloop()

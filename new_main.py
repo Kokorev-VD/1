@@ -18,8 +18,8 @@ print("test", fighter.get_data(test))'''
 acs = []
 stat = []
 
-neo1 = Neural(3, 5, "Angela", 2, 1, 0.005)
-neo1.change_super_parameters(1e-5, 300, 0.01, 200)
+neo1 = Neural(3, 5, "Clare", 2, 1, 0.005, 0)
+neo1.change_super_parameters(1e-5, 300, 0.005, 200)
 neo1.init_net()
 acs.append(neo1.train())
 stat = neo1.add_stat(stat)

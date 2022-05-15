@@ -36,6 +36,7 @@ class Neural:
     in_special = []
     rate_special = []
     out_special = []
+    is_gaming_neural = False
 
     def change_super_parameters(self, lr, n_epochs, learn_size, layer_size):
         self.lr = lr
@@ -43,7 +44,10 @@ class Neural:
         self.learn_size = learn_size
         self.layer_size = layer_size
 
-    def __init__(self, height, length, name, load_mode, train_mode, auto_stop):
+    def mark_as_gaming(self):
+        self.is_gaming_neural = True
+
+    def __init__(self, height, length, name, load_mode, train_mode, auto_stop, gaming_mode):
         # resetting
         self.train_mode = train_mode
         self.name = name
@@ -63,6 +67,9 @@ class Neural:
         self.rater = SituationRater()
         self.timer = 0
         self.start = 0
+
+        if gaming_mode == 1:
+            self.mark_as_gaming()
 
         if auto_stop != 0:
             self.auto_stop = True
@@ -119,12 +126,13 @@ class Neural:
         # self.model = Net(self.size, self.layer_size)
         self.model = Net(34, self.layer_size)
         torch.manual_seed(42)
-        self.x_tensor = torch.from_numpy(self.in_np).float()
-        self.y_tensor = torch.from_numpy(self.out_np).long()
+        if not self.is_gaming_neural:
+            self.x_tensor = torch.from_numpy(self.in_np).float()
+            self.y_tensor = torch.from_numpy(self.out_np).long()
 
-        # self.total = 7 ** (length*height)
-        self.total = len(self.in_np)
-        print(self.total)
+            # self.total = 7 ** (length*height)
+            self.total = len(self.in_np)
+            print(self.total)
 
         # Builds dataset with ALL data
         self.dataset = TensorDataset(self.x_tensor, self.y_tensor)
@@ -254,26 +262,7 @@ class Neural:
                 save_name = self.name + ".ckpt"
                 self.model.load_state_dict(torch.load(save_name))
             self.model.eval()
-
         accuracy = []
-        print("getting accuracy")
-        self.timer = time.time()
-        accuracy = self.get_acc(True)
-        s = 0
-        for i in range(len(accuracy)):
-            s += accuracy[i]
-        print("accuracy is ", s / len(accuracy) * 100, "%", sep="")
-        print("accuracy got in", round((time.time() - self.timer) / 60, 2), "minutes")
-        print("done in", round((time.time() - self.start) / 60, 1), "minutes")
-        print(time.asctime())
-        if self.train_mode == 1:
-            if self.name == "":
-                torch.save(self.model.state_dict(), "default.ckpt")
-            else:
-                save_name = self.name + ".ckpt"
-                torch.save(self.model.state_dict(), save_name)
-        if len(self.name) != 0:
-            print(self.name, "trained.", "\n")
 
         '''with torch.no_grad():
             t = 0
@@ -325,21 +314,46 @@ class Neural:
                 print(self.name, "trained.", "\n")
             return s/len(accuracy)*100'''
 
-        return s / len(accuracy) * 100
+        if not self.is_gaming_neural:
+            print("getting accuracy")
+            self.timer = time.time()
+            accuracy = self.get_acc(True)
+            s = 0
+            for i in range(len(accuracy)):
+                s += accuracy[i]
+            print("accuracy is ", s / len(accuracy) * 100, "%", sep="")
+            print("accuracy got in", round((time.time() - self.timer) / 60, 2), "minutes")
+            print("done in", round((time.time() - self.start) / 60, 1), "minutes")
+            print(time.asctime())
+            if self.train_mode == 1:
+                if self.name == "":
+                    torch.save(self.model.state_dict(), "default.ckpt")
+                else:
+                    save_name = self.name + ".ckpt"
+                    torch.save(self.model.state_dict(), save_name)
+            if len(self.name) != 0:
+                print(self.name, "trained.", "\n")
+
+            return s / len(accuracy) * 100
 
     def get_best(self, arr_input):
         fighter = Fighter()
         # print("answers creating")
         for i in range(len(self.in_special)):
-            pole = self.convert_field(self.in_special[i])
-            # print(self.in_data[i], " > ", pole)
-            self.out_special.append(fighter.get_data(pole))
-            if i % 50000 == 0:
-                print(i, self.out_data[len(self.out_special) - 1])
+            # pole = self.convert_field(self.in_special[i])
+            # # print(self.in_data[i], " > ", pole)
+            # self.out_special.append(fighter.get_data(pole))
+            # if i % 50000 == 0:
+            #     print(i, self.out_data[len(self.out_special) - 1])
+            self.out_special.append(404)
         # print("answers created")
 
+        # print(len(self.out_special), len(self.in_special), len(self.rate_special))
+
         self.in_special_np = np.array(self.rate_special)
-        self.out_special_np = np.array(self.out_data)
+        self.out_special_np = np.array(self.out_special)
+
+        # print(len(self.in_special_np), len(self.out_special_np))
 
         self.special_x_tensor = torch.from_numpy(self.in_special_np).float()
         self.special_y_tensor = torch.from_numpy(self.out_special_np).long()
@@ -355,12 +369,11 @@ class Neural:
             t = 0
             for x_sp, y_sp in self.special_dataset:
                 batch = torch.exp(self.model(x_sp)).tolist()
-                for i in range(len(batch)):
-                    t += 1
-                    if batch[i][0] > max_pred:
-                        max_pred = batch[i][0]
-                        max_batch = batch[i]
-                        i_max = t
+                # print(batch)
+                if batch[0] > max_pred:
+                    max_pred = batch[0]
+                    max_batch = batch
+                    i_max = t
 
         answer = [max_pred, max_batch, self.in_special[i_max], i_max]
         return answer
@@ -461,31 +474,43 @@ class Neural:
             array.append(self.wordlist[3])
             self.create_data_small(array)
 
-    def get_special_data(self, arr, arr_input):
+    def get_special_data(self, arr, arr_input, available):
         if len(arr) == self.size:
             self.in_special.append(arr)
+            # print(arr, self.convert_field(arr))
             self.rate_special.append(self.rater.get_rating(self.convert_field(arr)))
-            if len(self.in_special) % 50000 == 0:
-                print(len(self.in_data), self.in_data[len(self.in_special) - 1], self.rate_special[len(self.in_rate) - 1])
+            # if len(self.in_special) % 50000 == 0:
+            #     print(len(self.in_data), self.in_data[len(self.in_special) - 1], self.rate_special[len(self.in_rate) - 1])
             return
-        if len(arr) < len(arr_input):
-            arr = arr_input.copy()
+        # if len(arr) < len(arr_input):
+        #     arr = arr_input.copy()
         y = len(arr) // self.length
         x = len(arr) - y * self.length
+        # print(arr)
+        # if x <= max(0, int(self.length / 2 - 1)):
+        #     for i in range(3, 7):
+        #         array = arr.copy()
+        #         array.append(self.wordlist[i])
+        #         self.get_special_data(array, arr_input)
+        #     return
         if x <= max(0, int(self.length / 2 - 1)):
             for i in range(3, 7):
                 array = arr.copy()
                 array.append(self.wordlist[i])
                 self.get_special_data(array, arr_input)
         elif x >= min(self.length - 1, int((self.length + 1) / 2)):
-            for i in range(4):
-                array = arr.copy()
-                array.append(self.wordlist[i])
-                self.get_special_data(array, arr_input)
+            for i in range(3):
+                if available > 0:
+                    array = arr.copy()
+                    array.append(self.wordlist[i])
+                    self.get_special_data(array, arr_input, available - 1)
+            array = arr.copy()
+            array.append(self.wordlist[3])
+            self.get_special_data(array, arr_input, available)
         else:
             array = arr.copy()
             array.append(self.wordlist[3])
-            self.get_special_data(array, arr_input)
+            self.get_special_data(array, arr_input, available)
 
     def add_stat(self, array):
         if len(self.accuracies) != 0:

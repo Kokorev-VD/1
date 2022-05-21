@@ -7,8 +7,10 @@ import torch.nn as nn
 import torch.optim as optim
 from situationRater import SituationRater
 from pytorch_lightning import Trainer
-# from torch import Trainer
 import time
+from fieldManager import FieldManager
+# from torch import Trainer
+
 
 class Neural:
     # field = []
@@ -88,30 +90,31 @@ class Neural:
         self.heigth = height
         self.length = length
         # self.create_data([])
-        if load_mode == 1 or load_mode == 2:
-            sin = str(height) + '_' + str(length) + '_in_rate'
-            sout = str(height) + '_' + str(length) + '_out_data'
-        if load_mode == 0 or load_mode == 1:
-            self.timer = time.time()
-            self.create_data_small([])
-            print("data created in ", round((time.time() - self.timer)/60, 3), "minutes")
-            self.timer = time.time()
-            self.create_answers()
-            print("answers created in ", round((time.time() - self.timer)/60, 3), "minutes")
-        # self.in_np = np.array(self.in_data)
-        # print(len(self.in_rate), len(self.out_data))
-            self.in_np = np.array(self.in_rate)
-            self.out_np = np.array(self.out_data)
-            if load_mode == 1:
-                np.save(sin, self.in_np)
-                np.save(sout, self.out_np)
-        if load_mode == 2:
-            sin += '.npy'
-            sout += '.npy'
-            self.in_np = np.load(sin)
-            self.out_np = np.load(sout)
-            self.total = len(self.in_np)
-            print("loaded", len(self.in_np), len(self.in_np))
+        if not self.is_gaming_neural:
+            if load_mode == 1 or load_mode == 2:
+                sin = str(height) + '_' + str(length) + '_in_rate'
+                sout = str(height) + '_' + str(length) + '_out_data'
+            if load_mode == 0 or load_mode == 1:
+                self.timer = time.time()
+                self.create_data_small([])
+                print("data created in ", round((time.time() - self.timer) / 60, 3), "minutes")
+                self.timer = time.time()
+                self.create_answers()
+                print("answers created in ", round((time.time() - self.timer) / 60, 3), "minutes")
+                # self.in_np = np.array(self.in_data)
+                # print(len(self.in_rate), len(self.out_data))
+                self.in_np = np.array(self.in_rate)
+                self.out_np = np.array(self.out_data)
+                if load_mode == 1:
+                    np.save(sin, self.in_np)
+                    np.save(sout, self.out_np)
+            if load_mode == 2:
+                sin += '.npy'
+                sout += '.npy'
+                self.in_np = np.load(sin)
+                self.out_np = np.load(sout)
+                self.total = len(self.in_np)
+                print("loaded", len(self.in_np), len(self.in_np))
 
         # Sets hyper-parameters
         self.lr = 1e-3
@@ -119,7 +122,6 @@ class Neural:
         self.learn_size = 0.8
         self.layers = 2
         self.layer_size = 20
-
 
     def init_net(self):
         self.timer = time.time()
@@ -134,21 +136,20 @@ class Neural:
             self.total = len(self.in_np)
             print(self.total)
 
-        # Builds dataset with ALL data
-        self.dataset = TensorDataset(self.x_tensor, self.y_tensor)
-        print("creating dataset", len(self.dataset), self.total)
-        # Splits randomly into train and validation datasets
-        self.train_dataset, self.val_dataset =\
-            random_split(self.dataset, [int(self.total * self.learn_size), self.total - int(self.total * self.learn_size)])
-        # Builds a loader for each dataset to perform mini-batch gradient descent
-        self.train_loader = DataLoader(dataset=self.train_dataset, batch_size=14)
-        self.val_loader = DataLoader(dataset=self.val_dataset, batch_size=7)
-        self.accu_loader = DataLoader(dataset=self.dataset, batch_size=7)
-
+            # Builds dataset with ALL data
+            self.dataset = TensorDataset(self.x_tensor, self.y_tensor)
+            print("creating dataset", len(self.dataset), self.total)
+            # Splits randomly into train and validation datasets
+            self.train_dataset, self.val_dataset = \
+                random_split(self.dataset,
+                             [int(self.total * self.learn_size), self.total - int(self.total * self.learn_size)])
+            # Builds a loader for each dataset to perform mini-batch gradient descent
+            self.train_loader = DataLoader(dataset=self.train_dataset, batch_size=14)
+            self.val_loader = DataLoader(dataset=self.val_dataset, batch_size=7)
+            self.accu_loader = DataLoader(dataset=self.dataset, batch_size=7)
 
         # Defines loss function and optimizer
         self.loss_fn = nn.CrossEntropyLoss()
-
 
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.lr)
 
@@ -156,7 +157,7 @@ class Neural:
         self.val_losses = []
         # Creates function to perform train step from model, loss and optimizer
         # train_step = make_train_step(model, loss_fn, optimizer)
-        print("net inited in ", round((time.time() - self.timer)/60, 4), "minutes")
+        print("net inited in ", round((time.time() - self.timer) / 60, 4), "minutes")
 
     def get_prediction(self, model, loss_fn, optimizer, x):
         with torch.no_grad:
@@ -229,7 +230,8 @@ class Neural:
                         # Computes validation loss
                         self.val_loss = self.loss_fn(self.yhat, y_val)
                         self.val_losses.append(self.val_loss.item())
-                print("epoch", epoch + 1, "has passed in", round((time.time() - self.timer)/60, 3), "minutes, ", end="")
+                print("epoch", epoch + 1, "has passed in", round((time.time() - self.timer) / 60, 3), "minutes, ",
+                      end="")
                 with torch.no_grad():
                     accuracy = self.get_acc(False)
                     s = 0
@@ -241,7 +243,7 @@ class Neural:
                         if len(self.accuracies) > 1:
                             self.acc_diff.append(self.accuracies[len(self.accuracies) - 1] -
                                                  self.accuracies[len(self.accuracies) - 2])
-                            if self.accuracies[len(self.accuracies) - 1] - self.accuracies[len(self.accuracies) - 2] <\
+                            if self.accuracies[len(self.accuracies) - 1] - self.accuracies[len(self.accuracies) - 2] < \
                                     self.auto_break:
                                 if self.auto_flag:
                                     print(time.asctime(), "Training stopped automatically")
@@ -336,8 +338,11 @@ class Neural:
 
             return s / len(accuracy) * 100
 
-    def get_best(self, arr_input):
-        fighter = Fighter()
+        else:
+            return "accuracy solving aborted"
+
+    def get_best(self):
+        # fighter = Fighter()
         # print("answers creating")
         for i in range(len(self.in_special)):
             # pole = self.convert_field(self.in_special[i])
@@ -498,10 +503,8 @@ class Neural:
         #         self.get_special_data(array, arr_input)
         #     return
         if x <= max(0, int(self.length / 2 - 1)):
-            for i in range(3, 7):
-                array = arr.copy()
-                array.append(self.wordlist[i])
-                self.get_special_data(array, arr_input)
+            arr.append(arr_input[(len(arr_input) // self.heigth) * y + x])
+            self.get_special_data(arr, arr_input, available)
         elif x >= min(self.length - 1, int((self.length + 1) / 2)):
             for i in range(3):
                 if available > 0:

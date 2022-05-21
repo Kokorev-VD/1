@@ -1,14 +1,16 @@
 import pygame
-from fighter import Fighter
+# from fighter import Fighter
 from fieldManager import FieldManager
 
-import torch
-from heatmaper import Heatmaper
+# import torch
+# from heatmaper import Heatmaper
 from neural import Neural
-from statManager import StatManager
-from situationRater import SituationRater
-from net import Net
+# from statManager import StatManager
+# from situationRater import SituationRater
+# from net import Net
 
+
+#ПОМЫТЬ ПОЛЫ!!!
 pygame.init()
 screen = pygame.display.set_mode((1900, 1000))
 
@@ -16,20 +18,26 @@ pygame.display.flip()
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 20)
 
+Wa_skin = pygame.image.load("white attacker.png")
+Wd_skin = pygame.image.load("white defender.png")
+Wg_skin = pygame.image.load("white gunner.png")
+
+Ba_skin = pygame.image.load("black attacker.png")
+Bd_skin = pygame.image.load("black defender.png")
+Bg_skin = pygame.image.load("black gunner.png")
+
 pole = [["O", "O", "O"], ["O", "O", "O"], ["", "", ""], ["O", "O", "O"], ["O", 'O', "O"]]
 nmbrs = "0123456789"
 
 
-def set_pole(pol):
-    pole = pol
-
-
 class Button:
     def __init__(self, text, pos, font, number, bg="black", feedback=""):
+        self.skin = pygame.image.load("empty.png")
         self.bg = bg
         self.x, self.y = pos
         self.number = number
         self.t = text
+        self.skin.set_colorkey((255, 255, 255))
         if number == -1:
             self.visible = False
         else:
@@ -39,6 +47,8 @@ class Button:
             self.feedback = "text"
         else:
             self.feedback = feedback
+        self.skin_rect = self.skin.get_rect(
+            bottomright=(self.x, self.y))
         self.change_text(text, bg)
 
     def change_text(self, text, bg="black"):
@@ -50,6 +60,7 @@ class Button:
         self.surface.fill(bg)
         self.surface.blit(self.text, (0, 0))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
+
 
     def show(self):
         if self.visible:
@@ -72,6 +83,16 @@ class Button:
                             btn.visible = True
                         if btn.number == int(self.feedback[len(self.feedback) - 1]):
                             btn.change_text(self.t, "navy")
+                            if self.t == " a ":
+                                btn.skin = Wa_skin
+                            if self.t == " d ":
+                                btn.skin = Wd_skin
+                            if self.t == " g ":
+                                btn.skin = Wg_skin
+                            btn.skin = pygame.transform.scale(btn.skin, (100, 100))
+                            btn.skin_rect = btn.skin.get_rect(
+                                bottomright=(btn.x+125, btn.y+150))
+                            # print(self.t)
                             btn.t = self.t
                             for btn1 in btns:
                                 if btn1.feedback[len(btn1.feedback) - 1] in nmbrs:
@@ -112,7 +133,7 @@ class Button:
                     # stat = neo1.add_stat(stat)
                     #
                     # print(acs)
-                    neo1.train()  # НЕ СТЕРАТЬ, даже если кажется, что не нужно
+                    neo1.train()  # НЕ СТИРАТЬ, даже если кажется, что не нужно
 
                     # StatManager.create_stat(stat)
                     # StatManager.show_all()
@@ -135,12 +156,17 @@ class Button:
 
 
 def mainloop():
-    back_s = pygame.image.load('bcg.png')
+    back_s = pygame.image.load('new_bg.png')
     back_s = pygame.transform.scale(back_s, (1900, 1000))
     back = back_s.get_rect(bottomright=(1900, 1000))
+
     while True:
         screen.fill((215, 225, 250))
         screen.blit(back_s, back)
+        for btn in btns:
+            screen.blit(btn.skin, btn.skin_rect)
+            # print(btn.skin)
+            # print(btn.skin_rect)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -148,26 +174,27 @@ def mainloop():
                 btn.click(event)
         for btn in btns:
             btn.show()
+            screen.blit(btn.skin, btn.skin_rect)
         clock.tick(30)
 
         pygame.display.update()
 
 
-ix = 360
+ix = 365
 iy = 155
 btns = []
 for i in range(2):
     for j in range(3):
         button1 = Button(
             " O ",
-            (ix + i * 290, iy + j * 264),
+            (ix + i * 260, iy + j * 220),
             font=30,
             number=j + 3 * i,
             bg="navy",
             feedback="Creation btn")
         btn1 = Button(
             " a ",
-            (ix + i * 290 + 30, iy + j * 264),
+            (ix + i * 260 + 30, iy + j * 220),
             font=30,
             number=-1,
             bg="green",
@@ -175,7 +202,7 @@ for i in range(2):
 
         btn2 = Button(
             " d ",
-            (ix + i * 290 + 30, iy + j * 264 + 30),
+            (ix + i * 260 + 30, iy + j * 220 + 30),
             font=30,
             number=-1,
             bg="green",
@@ -183,7 +210,7 @@ for i in range(2):
 
         btn3 = Button(
             " g ",
-            (ix + i * 290 + 30, iy + j * 264 + 60),
+            (ix + i * 260 + 30, iy + j * 220 + 60),
             font=30,
             number=-1,
             bg="green",
@@ -192,12 +219,12 @@ for i in range(2):
         btns.append(btn1)
         btns.append(btn2)
         btns.append(btn3)
-ix += 290 * 2
+ix += 260 * 2
 for i in range(3):
     for j in range(3):
         b1 = Button(
             " O ",
-            (ix + i * 290, iy + j * 264),
+            (ix + i * 260, iy + j * 220),
             font=30,
             number=j + 3 * i + 6,
             bg="red",

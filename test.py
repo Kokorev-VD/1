@@ -5,12 +5,12 @@ from fieldManager import FieldManager
 # import torch
 # from heatmaper import Heatmaper
 from neural import Neural
+
 # from statManager import StatManager
 # from situationRater import SituationRater
 # from net import Net
 
 
-#ПОМЫТЬ ПОЛЫ!!!
 pygame.init()
 screen = pygame.display.set_mode((1900, 1000))
 
@@ -28,6 +28,31 @@ Bg_skin = pygame.image.load("black gunner.png")
 
 pole = [["O", "O", "O"], ["O", "O", "O"], ["", "", ""], ["O", "O", "O"], ["O", 'O', "O"]]
 nmbrs = "0123456789"
+dict = {0: 0, 5: 1, 10: 2, 1: 3, 6: 4, 11: 5, 2: 6, 7: 7, 12: 8, 3: 9, 8: 10, 13: 11, 4: 12, 9: 13, 14: 14}
+
+
+def update(pole): # питается массивами 1 на 15, построчно, как у тебя в расстоновке
+    for btn in btns:
+        for i in range(len(pole)):
+            if btn.number == dict[i]:
+                if pole[i] == 0:
+                    btn.skin = pygame.image.load("empty.png")
+                    btn.skin.set_colorkey((255, 255, 255))
+                if pole[i] == 1:
+                    btn.skin = Wa_skin
+                if pole[i] == 2:
+                    btn.skin = Wd_skin
+                if pole[i] == 3:
+                    btn.skin = Wg_skin
+                if pole[i] == -1:
+                    btn.skin = Ba_skin
+                if pole[i] == -2:
+                    btn.skin = Bd_skin
+                if pole[i] == -3:
+                    btn.skin = Bg_skin
+                btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                btn.skin_rect = btn.skin.get_rect(
+                    bottomright=(btn.x + 100, btn.y + 150))
 
 
 class Button:
@@ -51,9 +76,9 @@ class Button:
             bottomright=(self.x, self.y))
         self.change_text(text, bg)
 
-    def change_text(self, text, bg=""):
+    def change_text(self, text, bg="custom"):
         self.text = self.font.render(text, 1, pygame.Color("White"))
-        if self.number >= 6 and self.number<=8:
+        if self.number >= 6 and self.number <= 8:
             self.text = self.font.render(str(pole[int(self.number / 3)][self.number % 3]), 1, pygame.Color("White"))
         self.size = self.text.get_size()
         self.surface = pygame.Surface(self.size)
@@ -66,7 +91,6 @@ class Button:
                 self.surface.fill(bg)
         self.surface.blit(self.text, (0, 0))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
-
 
     def show(self):
         if self.visible:
@@ -97,7 +121,7 @@ class Button:
                                 btn.skin = Wg_skin
                             btn.skin = pygame.transform.scale(btn.skin, (80, 100))
                             btn.skin_rect = btn.skin.get_rect(
-                                bottomright=(btn.x+100, btn.y+150))
+                                bottomright=(btn.x + 100, btn.y + 150))
                             # print(self.t)
                             btn.t = self.t
                             for btn1 in btns:
@@ -138,22 +162,22 @@ class Button:
                         neo1 = Neural(3, 5, "", 2, 2, 0.005, 1)
                         neo1.change_super_parameters(1e-5, 300, 0.005, 200)
                         neo1.init_net()
-                    # neo1.stop_calculating_acc()
-                    # acs.append(neo1.train())
-                    # stat = neo1.add_stat(stat)
-                    #
-                    # print(acs)
+                        # neo1.stop_calculating_acc()
+                        # acs.append(neo1.train())
+                        # stat = neo1.add_stat(stat)
+                        #
+                        # print(acs)
                         neo1.train()  # НЕ СТИРАТЬ, даже если кажется, что не нужно
 
-                    # StatManager.create_stat(stat)
-                    # StatManager.show_all()
+                        # StatManager.create_stat(stat)
+                        # StatManager.show_all()
 
                         neo1.get_special_data([], true_res, ava)
                         print(neo1.get_best())
                         print(FieldManager.get_best())
                         for btn in btns:
                             for rs in range(15):
-                                if FieldManager.get_best()[rs]<0:
+                                if FieldManager.get_best()[rs] < 0:
                                     if btn.number == 9 and rs == 3:
                                         if FieldManager.get_best()[rs] == -1:
                                             btn.skin = Ba_skin
@@ -233,8 +257,12 @@ class Button:
                                         btn.skin_rect = btn.skin.get_rect(
                                             bottomright=(btn.x + 100, btn.y + 150))
                     elif self.t == " Tap to start game ":
-                        self.visible = False
-
+                        for btn in btns:
+                            if btn.number != -4:
+                                btn.visible = False
+                        l_tf.change_text("Pupa")
+                        u_tf.change_text("Lupa")
+                        #update([0, 0, 0, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0])
                     # Пример вывода после нажатия на кнопку:
                     #
                     # [[' O ', ' O '], [' a ', ' O '], [' O ', ' O ']] - входные данные
@@ -329,5 +357,23 @@ endbut = Button(
     number=-2,
     bg="custom",
     feedback="End btn")
+l_tf = Button(
+    " 0 ",
+    (1555, 890),
+    font=60,
+    number=-4,
+    bg="custom",
+    feedback=""
+)
+u_tf = Button(
+    " 0 ",
+    (920, 20),
+    font=60,
+    number=-4,
+    bg="custom",
+    feedback="End btn"
+)
+btns.append(l_tf)
+btns.append(u_tf)
 btns.append(endbut)
 mainloop()

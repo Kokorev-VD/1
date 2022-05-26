@@ -504,8 +504,8 @@ class Neural:
             self.in_special.append(arr)
             # print(arr, self.convert_field(arr))
             self.rate_special.append(self.rater.get_rating(self.convert_field(arr)))
-            # if len(self.in_special) % 50000 == 0:
-            #     print(len(self.in_data), self.in_data[len(self.in_special) - 1], self.rate_special[len(self.in_rate) - 1])
+# if len(self.in_special) % 50000 == 0:
+#     print(len(self.in_data), self.in_data[len(self.in_special) - 1], self.rate_special[len(self.in_rate) - 1])
             return
         # if len(arr) < len(arr_input):
         #     arr = arr_input.copy()

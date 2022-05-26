@@ -59,7 +59,11 @@ class Button:
         self.surface = pygame.Surface(self.size)
         if bg != "black":
             self.surface.set_alpha(125)
-            self.surface.fill(bg)
+            if bg == "custom":
+                color = (99,103,128)
+                self.surface.fill(color)
+            else:
+                self.surface.fill(bg)
         self.surface.blit(self.text, (0, 0))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
 
@@ -103,12 +107,12 @@ class Button:
                                         btn1.visible = False
                 if self.rect.collidepoint(x, y) and self.feedback == "End btn":
                     print(self.t)
-                    if self.t == " Tap to calculate ":
+                    if self.t == "   Tap to calculate ":
                         res = [[0, 0], [0, 0], [0, 0]]
                         for btn in btns:
                             if btn.number < 6 and btn.number > -1:
                                 res[btn.number % 3][int(btn.number / 3)] = btn.t
-                        self.change_text(" Tap to start game ", "black")
+                        self.change_text(" Tap to start game ", "custom")
                         self.t = " Tap to start game "
                         print(res)  # <------
                         true_res = []
@@ -319,11 +323,11 @@ for i in range(3):
             feedback="")
         btns.append(b1)
 endbut = Button(
-    " Tap to calculate ",
-    (780, 900),
+    "   Tap to calculate ",
+    (750, 890),
     font=60,
     number=-2,
-    bg="black",
+    bg="custom",
     feedback="End btn")
 btns.append(endbut)
 mainloop()

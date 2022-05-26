@@ -51,13 +51,15 @@ class Button:
             bottomright=(self.x, self.y))
         self.change_text(text, bg)
 
-    def change_text(self, text, bg="black"):
+    def change_text(self, text, bg=""):
         self.text = self.font.render(text, 1, pygame.Color("White"))
-        if self.feedback == "text":
+        if self.number >= 6 and self.number<=8:
             self.text = self.font.render(str(pole[int(self.number / 3)][self.number % 3]), 1, pygame.Color("White"))
         self.size = self.text.get_size()
         self.surface = pygame.Surface(self.size)
-        self.surface.fill(bg)
+        if bg != "black":
+            self.surface.set_alpha(125)
+            self.surface.fill(bg)
         self.surface.blit(self.text, (0, 0))
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
 
@@ -89,9 +91,9 @@ class Button:
                                 btn.skin = Wd_skin
                             if self.t == " g ":
                                 btn.skin = Wg_skin
-                            btn.skin = pygame.transform.scale(btn.skin, (100, 100))
+                            btn.skin = pygame.transform.scale(btn.skin, (80, 100))
                             btn.skin_rect = btn.skin.get_rect(
-                                bottomright=(btn.x+125, btn.y+150))
+                                bottomright=(btn.x+100, btn.y+150))
                             # print(self.t)
                             btn.t = self.t
                             for btn1 in btns:
@@ -100,47 +102,134 @@ class Button:
                                             btn1.feedback[len(btn1.feedback) - 1]):
                                         btn1.visible = False
                 if self.rect.collidepoint(x, y) and self.feedback == "End btn":
-                    res = [[0, 0], [0, 0], [0, 0]]
-                    for btn in btns:
-                        if btn.number < 6 and btn.number > -1:
-                            res[btn.number % 3][int(btn.number / 3)] = btn.t
-                    print(res)  # <------
-                    true_res = []
-                    ava = 0
-                    for st in res:
-                        for un in st:
-                            if un == ' a ':
-                                true_res.append(1)
-                                ava += 1
-                            elif un == ' d ':
-                                true_res.append(2)
-                                ava += 1
-                            elif un == ' g ':
-                                true_res.append(3)
-                                ava += 1
-                            else:
-                                true_res.append(0)
-                    print(true_res, ava)
+                    print(self.t)
+                    if self.t == " Tap to calculate ":
+                        res = [[0, 0], [0, 0], [0, 0]]
+                        for btn in btns:
+                            if btn.number < 6 and btn.number > -1:
+                                res[btn.number % 3][int(btn.number / 3)] = btn.t
+                        self.change_text(" Tap to start game ", "black")
+                        self.t = " Tap to start game "
+                        print(res)  # <------
+                        true_res = []
+                        ava = 0
+                        for st in res:
+                            for un in st:
+                                if un == ' a ':
+                                    true_res.append(1)
+                                    ava += 1
+                                elif un == ' d ':
+                                    true_res.append(2)
+                                    ava += 1
+                                elif un == ' g ':
+                                    true_res.append(3)
+                                    ava += 1
+                                else:
+                                    true_res.append(0)
+                        print(true_res, ava)
 
-                    # acs = []
-                    # stat = []
+                        # acs = []
+                        # stat = []
 
-                    neo1 = Neural(3, 5, "", 2, 2, 0.005, 1)
-                    neo1.change_super_parameters(1e-5, 300, 0.005, 200)
-                    neo1.init_net()
+                        neo1 = Neural(3, 5, "", 2, 2, 0.005, 1)
+                        neo1.change_super_parameters(1e-5, 300, 0.005, 200)
+                        neo1.init_net()
                     # neo1.stop_calculating_acc()
                     # acs.append(neo1.train())
                     # stat = neo1.add_stat(stat)
                     #
                     # print(acs)
-                    neo1.train()  # НЕ СТИРАТЬ, даже если кажется, что не нужно
+                        neo1.train()  # НЕ СТИРАТЬ, даже если кажется, что не нужно
 
                     # StatManager.create_stat(stat)
                     # StatManager.show_all()
 
-                    neo1.get_special_data([], true_res, ava)
-                    print(neo1.get_best())
-                    print(FieldManager.get_best())
+                        neo1.get_special_data([], true_res, ava)
+                        print(neo1.get_best())
+                        print(FieldManager.get_best())
+                        for btn in btns:
+                            for rs in range(15):
+                                if FieldManager.get_best()[rs]<0:
+                                    if btn.number == 9 and rs == 3:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                                    if btn.number == 12 and rs == 4:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                                    if btn.number == 10 and rs == 8:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                                    if btn.number == 13 and rs == 9:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                                    if btn.number == 11 and rs == 13:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                                    if btn.number == 14 and rs == 14:
+                                        if FieldManager.get_best()[rs] == -1:
+                                            btn.skin = Ba_skin
+                                            btn.change_text(" a ", "red")
+                                        elif FieldManager.get_best()[rs] == -2:
+                                            btn.skin = Bd_skin
+                                            btn.change_text(" d ", "red")
+                                        elif FieldManager.get_best()[rs] == -3:
+                                            btn.skin = Bg_skin
+                                            btn.change_text(" g ", "red")
+                                        btn.skin = pygame.transform.scale(btn.skin, (80, 100))
+                                        btn.skin_rect = btn.skin.get_rect(
+                                            bottomright=(btn.x + 100, btn.y + 150))
+                    elif self.t == " Tap to start game ":
+                        self.visible = False
 
                     # Пример вывода после нажатия на кнопку:
                     #
@@ -202,7 +291,7 @@ for i in range(2):
 
         btn2 = Button(
             " d ",
-            (ix + i * 260 + 30, iy + j * 220 + 30),
+            (ix + i * 260 + 30, iy + j * 220 + 40),
             font=30,
             number=-1,
             bg="green",
@@ -210,7 +299,7 @@ for i in range(2):
 
         btn3 = Button(
             " g ",
-            (ix + i * 260 + 30, iy + j * 220 + 60),
+            (ix + i * 260 + 30, iy + j * 220 + 80),
             font=30,
             number=-1,
             bg="green",
@@ -231,9 +320,9 @@ for i in range(3):
             feedback="")
         btns.append(b1)
 endbut = Button(
-    " Нажмите, чтобы отправить данные нейросети ",
-    (670, 900),
-    font=30,
+    " Tap to calculate ",
+    (780, 900),
+    font=60,
     number=-2,
     bg="black",
     feedback="End btn")

@@ -6,7 +6,7 @@ from fighter import Fighter
 import torch.nn as nn
 import torch.optim as optim
 from situationRater import SituationRater
-from pytorch_lightning import Trainer
+# from pytorch_lightning import Trainer
 import time
 from fieldManager import FieldManager
 # from torch import Trainer

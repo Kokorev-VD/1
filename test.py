@@ -243,7 +243,6 @@ class Button:
                     # последнюю подобранную расстановку можно посмотреть тут - FieldManager.get_best()
 
 
-
 def mainloop():
     back_s = pygame.image.load('new_bg.png')
     back_s = pygame.transform.scale(back_s, (1900, 1000))

@@ -485,6 +485,22 @@ class Neural:
 
     def get_special_data(self, arr, arr_input, available):
         if len(arr) == self.size:
+            black_num = 0
+            white_num = 0
+            lines_white = [0, 0, 0]
+            lines_black = [0, 0, 0]
+            for i in range(len(arr)):
+                if arr[i] < 0:
+                    black_num += 1
+                    lines_black[i//self.length] += 1
+                if arr[i] > 0:
+                    white_num += 1
+                    lines_white[i//self.length] += 1
+            for i in range(3):
+                if lines_white[i] != 0 and lines_black[i] == 0:
+                    return
+            if black_num < white_num:
+                return
             self.in_special.append(arr)
             # print(arr, self.convert_field(arr))
             self.rate_special.append(self.rater.get_rating(self.convert_field(arr)))

@@ -5,7 +5,7 @@ from fieldManager import FieldManager
 # import torch
 # from heatmaper import Heatmaper
 from neural import Neural
-
+from fighter import Fighter
 # from statManager import StatManager
 # from situationRater import SituationRater
 # from net import Net
@@ -18,6 +18,8 @@ pygame.display.flip()
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 20)
 
+
+
 Wa_skin = pygame.image.load("white attacker.png")
 Wd_skin = pygame.image.load("white defender.png")
 Wg_skin = pygame.image.load("white gunner.png")
@@ -29,9 +31,16 @@ Bg_skin = pygame.image.load("black gunner.png")
 pole = [["O", "O", "O"], ["O", "O", "O"], ["", "", ""], ["O", "O", "O"], ["O", 'O', "O"]]
 nmbrs = "0123456789"
 dict = {0: 0, 5: 1, 10: 2, 1: 3, 6: 4, 11: 5, 2: 6, 7: 7, 12: 8, 3: 9, 8: 10, 13: 11, 4: 12, 9: 13, 14: 14}
-
+units = [0 for x in range(15)]
+u1 = [[0 for x in range(5)] for x in range(3)]
+prepun = [[0 for x in range(5)] for x in range(3)]
+print(units)
 
 def update(pole): # питается массивами 1 на 15, построчно, как у тебя в расстоновке
+    units.clear()
+    for i in range(15):
+        units.append(pole[i])
+    subcol()
     for btn in btns:
         for i in range(len(pole)):
             if btn.number == dict[i]:
@@ -54,8 +63,33 @@ def update(pole): # питается массивами 1 на 15, постро�
                 btn.skin_rect = btn.skin.get_rect(
                     bottomright=(btn.x + 100, btn.y + 150))
 
+def subcol():
+    for p in range(15):
+        prepun[int(p/5)][p % 5] = units[p]
+
+def collect():
+    for btn in btns:
+        if 0 <= btn.number <= 14:
+            if btn.t == " a " and btn.number<6:
+                units[int(btn.number/3) + (btn.number%3*5)] = 1
+            if btn.t == " a " and btn.number>8:
+                units[int(btn.number/3) + (btn.number%3*5)] = -1
+            if btn.t == " d " and btn.number<6:
+                units[int(btn.number/3) + (btn.number%3*5)] = 2
+            if btn.t == " d " and btn.number>8:
+                units[int(btn.number/3) + (btn.number%3*5)] = -2
+            if btn.t == " g " and btn.number<6:
+                units[int(btn.number/3) + (btn.number%3*5)] = 3
+            if btn.t == " g " and btn.number>8:
+                units[int(btn.number/3) + (btn.number%3*5)] = -3
+    subcol()
+    for i in range(3):
+        for j in range(5):
+            u1[i][j] = prepun[i][j]
+
 
 class Button:
+
     def __init__(self, text, pos, font, number, bg="black", feedback=""):
         self.skin = pygame.image.load("empty.png")
         self.bg = bg
@@ -136,8 +170,13 @@ class Button:
                         for btn in btns:
                             if btn.number < 6 and btn.number > -1:
                                 res[btn.number % 3][int(btn.number / 3)] = btn.t
-                        self.change_text(" Tap to start game ", "custom")
-                        self.t = " Tap to start game "
+                        self.change_text(" Tap to calculate game ", "custom")
+                        self.t = " Tap to calculate game "
+                        for btn in btns:
+                            if btn.number == -4 and btn.feedback == "End btn":
+                                btn.t = " Tap to start game "
+                                btn.change_text(" Tap to start game ")
+                                btn.visible = True
                         print(res)  # <------
                         true_res = []
                         ava = 0
@@ -180,12 +219,15 @@ class Button:
                                 if FieldManager.get_best()[rs] < 0:
                                     if btn.number == 9 and rs == 3:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
@@ -193,12 +235,15 @@ class Button:
                                             bottomright=(btn.x + 100, btn.y + 150))
                                     if btn.number == 12 and rs == 4:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
@@ -206,12 +251,15 @@ class Button:
                                             bottomright=(btn.x + 100, btn.y + 150))
                                     if btn.number == 10 and rs == 8:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
@@ -219,12 +267,15 @@ class Button:
                                             bottomright=(btn.x + 100, btn.y + 150))
                                     if btn.number == 13 and rs == 9:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
@@ -232,12 +283,15 @@ class Button:
                                             bottomright=(btn.x + 100, btn.y + 150))
                                     if btn.number == 11 and rs == 13:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
@@ -245,23 +299,104 @@ class Button:
                                             bottomright=(btn.x + 100, btn.y + 150))
                                     if btn.number == 14 and rs == 14:
                                         if FieldManager.get_best()[rs] == -1:
+                                            btn.t = " a "
                                             btn.skin = Ba_skin
                                             btn.change_text(" a ", "red")
                                         elif FieldManager.get_best()[rs] == -2:
+                                            btn.t = " d "
                                             btn.skin = Bd_skin
                                             btn.change_text(" d ", "red")
                                         elif FieldManager.get_best()[rs] == -3:
+                                            btn.t = " g "
                                             btn.skin = Bg_skin
                                             btn.change_text(" g ", "red")
                                         btn.skin = pygame.transform.scale(btn.skin, (80, 100))
                                         btn.skin_rect = btn.skin.get_rect(
                                             bottomright=(btn.x + 100, btn.y + 150))
+
+                    elif self.t == " Tap to calculate game ":
+                        for btn in btns:
+                            btn.visible = False
+                        collect()
+                        fighter = Fighter()
+                        fighter.fill_pole(prepun)
+                        fighter.fill_fighters(prepun)
+                        s = ""
+                        m = 0
+                        if fighter.fight() == 2:
+                            s = " White team wins! "
+                            m = 1
+                        if fighter.fight() == 0:
+                            s = " Black team wins! "
+                            m = 1
+                        if fighter.fight() == 1:
+                            s = " Draw! "
+                        bn = Button(
+                            s,
+                            (880-m*150, 450),
+                            font=60,
+                            number=-4,
+                            bg="custom",
+                            feedback=""
+                        )
+                        btns.append(bn)
                     elif self.t == " Tap to start game ":
                         for btn in btns:
-                            if btn.number != -4:
-                                btn.visible = False
-                        l_tf.change_text("Pupa")
-                        u_tf.change_text("Lupa")
+                            if btn.t == " Tap to calculate game ":
+                                btn.t = " Next turn "
+                                btn.change_text(" Next turn ")
+                            if btn.t == " Tap to start game ":
+                                btn.change_text(" O ")
+
+                        collect()
+
+                    elif self.t == " Next turn ":
+                        # l_tf.change_text(" " + str(trn) + " ")
+                        # trn+=1
+                        fighter = Fighter()
+                        # try:
+                        u1.clear()
+                        u1.append(units)
+                        fighter.fill_pole(prepun)
+                        fighter.fill_fighters(prepun)
+                        fighter.hf()
+                        update(fighter.get_Sosison())
+                        flag1 = False
+                        flag2 = False
+                        if u1[0] == units:
+                            for x in units:
+                                if x<0:
+                                    flag2 = True
+                                if x>0:
+                                    flag1 = True
+                            s = ""
+                            m = 0
+                            l = 0
+                            if flag1 and not flag2:
+                                s = " White team wins! "
+                                m = 1
+                                l = 1
+                            if flag2 and not flag1:
+                                s = " Black team wins! "
+                                m = 1
+                                l = 1
+                            # if flag1 and flag2 or not(flag1 or flag2):
+                            #     s = " Draw! "
+                            #     l = 1
+                            if l == 1:
+                                bn = Button(
+                                    s,
+                                    (880 - m * 150, 450),
+                                    font=60,
+                                    number=-4,
+                                    bg="custom",
+                                    feedback=""
+                                )
+                                for btn in btns:
+                                    btn.visible = False
+                                btns.append(bn)
+
+
                         #update([0, 0, 0, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0])
                     # Пример вывода после нажатия на кнопку:
                     #
@@ -303,6 +438,7 @@ def mainloop():
 ix = 365
 iy = 155
 btns = []
+trn = 0
 for i in range(2):
     for j in range(3):
         button1 = Button(
@@ -367,12 +503,14 @@ l_tf = Button(
 )
 u_tf = Button(
     " 0 ",
-    (920, 20),
-    font=60,
+    (820, 40),
+    font=40,
     number=-4,
     bg="custom",
     feedback="End btn"
 )
+u_tf.visible = False
+l_tf.visible = False
 btns.append(l_tf)
 btns.append(u_tf)
 btns.append(endbut)

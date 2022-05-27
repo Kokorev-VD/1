@@ -13,6 +13,7 @@ class Unit(object):
     def __init__(self, posX, posY, pole, side, print_attack):
         self.x_position = posX
         self.y_position = posY
+        self.skin+=side[0]
         pole[self.x_position][self.y_position] = self.skin
         self.side = side
         self.print_attack = print_attack
@@ -35,7 +36,7 @@ class Unit(object):
                 if self.print_attack:
                     print(cls.side + " " + cls.name() + " at position: " + str(
                     cls.x_position) + " " + str(cls.y_position) + " attacked " + self.side + " " + self.name() + " at position: " +
-                      str(self.x_position) + " " + str(self.y_position))
+                      str(self.x_position) + " " + str(self.y_position) + " Health " + str(self.health))
                     print("-------------------------" + "\n" + "-------------------------")
         if cls.name() == "Defender":
             if self.alive and cls.alive and ((self.x_position + 1 == cls.x_position and self.y_position + 1 == cls.y_position) or (

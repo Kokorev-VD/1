@@ -375,8 +375,8 @@ class Neural:
             for x_sp, y_sp in self.special_dataset:
                 batch = torch.exp(self.model(x_sp)).tolist()
                 # print(batch, end='')
-                if (batch[2] > max_pred and t < len(self.in_special) - 1) or t == 0:
-                    max_pred = batch[2]
+                if (batch[0] > max_pred and t < len(self.in_special) - 1) or t == 0:
+                    max_pred = batch[0]
                     max_batch = batch
                     i_max = t
                     # print(" <-", end='')
